@@ -84,23 +84,23 @@ parse_args() {
             keys=( $key )
         fi
 
-        for key in "${keys[@]}"; do
+        for ((i=0; $i<${#keys[@]}; i=$i+1)); do
+            key=${keys[$i]}
             if [[ -n "${ARG_PROPERTIES[$key,help]}" ]]; then
                 if [[ "${ARG_PROPERTIES[$key,type]}" == "bool" ]]; then
                     declare -g "$key"="true"
-                    [[ $key == "${keys[-1]}" ]] && shift # past the flag argument
-                elif [[ $key != "${keys[-1]}" ]]; then
+                elif [[ $i -eq "${#keys[@]}" ]]; then
                     display_error "Missing value for argument --$key" #only the last key can take an argument
                 else
                     [[ -z "$2" || "$2" == --* ]] && display_error "Missing value for argument --$key"
                     declare -g "$key"="$2"
-                    shift # past argument
                     shift # past value
                 fi
             else
                 display_error "Unknown option: $key"
             fi
         done
+        shift # past argument
     done
 
     # Check for required arguments
